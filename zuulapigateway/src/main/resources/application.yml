@@ -1,0 +1,19 @@
+zuul:
+  ignoredServices: '*'
+  prefix: /api
+  routes:
+    user:
+      path: /user/**
+      serviceId: senderService
+      strip-prefix: false
+    copy:
+      path: /copy/**
+      serviceId: receiverService
+      strip-prefix: false
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+

@@ -1,0 +1,54 @@
+version: '3.3'
+
+services:
+  mongo:
+    image: mongo
+    ports:
+    - "27017:27017"
+    command: --smallfiles
+
+#uncomment if you need mongo client
+
+#  mongo-client:
+#    image: mongoclient/mongoclient
+#    ports:
+#    - "3030:3000"
+#    environment:
+#      - MONGOCLIENT_DEFAULT_CONNECTION_URL=mongodb://mongo:27017
+#    links:
+#      - mongo
+
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5673:5672" #JMS Port
+      - "15673:15672" #Management Port - default user:pass = guest:guest
+
+  eurekaserver:
+    image: sherif98/eurekaregistry
+    ports:
+     - "8761:8761"
+
+  gateway:
+    image: sherif98/zuulapigateway
+    ports:
+    - "8000:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka
+
+  sender-service:
+    image: sherif98/senderservice
+    ports:
+    - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka
+      - SPRING_RABBITMQ_HOST=rabbitmq
+
+  receive-service:
+    image: sherif98/receiverservice
+    ports:
+    - "8081:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka
+      - SPRING_RABBITMQ_HOST=rabbitmq
